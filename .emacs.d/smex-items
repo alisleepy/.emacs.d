@@ -1,0 +1,18 @@
+
+;; ----- smex-history -----
+(
+ package-list-packages
+ customize-group
+ neotree-dir
+ cd
+ 5x5
+ arp
+ dbx
+)
+
+;; ----- smex-data -----
+(
+ (customize-group . 2)
+ (neotree-dir . 3)
+ (package-list-packages . 2)
+)

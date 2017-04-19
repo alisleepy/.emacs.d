@@ -1,0 +1,67 @@
+;;php代码高亮
+(load "php-mode")
+(add-to-list 'auto-mode-alist '("\\.php\\'" . php-mode))
+(add-to-list 'auto-mode-alist '("\\.phps\\'" . php-mode))
+
+;;php开发模式
+(eval-after-load 'php-mode  '(require 'php-ext))
+(add-hook 'php-mode-hook 'php-enable-default-coding-style)
+(add-hook 'php-mode-hook (lambda () (subword-mode 1)))
+
+;;php语法检测
+(require 'flymake-php)
+  (add-hook 'php-mode-hook 'flymake-php-load)
+
+;;运行php
+(define-key php-mode-map
+[menu-bar php php-run]
+'("Run PHP" . php-run))
+(defun php-run ()
+(interactive)
+(message buffer-file-name)
+(shell-command
+(concat "D:/wamp/bin/php/php5.5.12/php.exe -f \""
+(buffer-file-name)
+"\"")))
+;;这里是绑定函数到快捷键C+c r
+(defun my-php-mode()
+  (define-key php-mode-map [(control c) (r)] 'php-run)
+					;(define-key php-mode-map [(control c) (d)] 'php-debug)
+  (hs-minor-mode t)
+  (linum-mode t)
+)
+(add-hook 'php-mode-hook 'my-php-mode)
+
+;;删除整行 M-w
+ (defadvice kill-ring-save (before slickcopy activate compile)  
+ (interactive  
+(if mark-active (list (region-beginning) (region-end))  
+(list (line-beginning-position)  
+(line-beginning-position 2)))))  
+(defadvice kill-region (before slickcut activate compile)  
+(interactive  
+(if mark-active (list (region-beginning)
+		      (region-end))
+  (list (line-beginning-position)
+ (line-beginning-position 2))))) 
+
+
+;;优化注释代码功能 M-:在行尾时对行尾进行注释，在行的其他位置注释该行，选中区域则注释该区域
+(defun qiang-comment-dwim-line (&optional arg)
+(interactive "*P")
+(comment-normalize-vars)
+(if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+(comment-or-uncomment-region (line-beginning-position) (line-end-position))
+ (comment-dwim arg)))
+(global-set-key "\M-;" 'qiang-comment-dwim-line)
+
+;;f3 撤销
+(global-set-key [f3] 'undo)
+
+;;全局搜索
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'php-mode)
+              (ggtags-mode 1))))
+
+(provide 'init-php)
